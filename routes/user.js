@@ -43,24 +43,25 @@ router.post("/courses/:courseId", userMiddleware, async (req, res) => {
 
 router.get("/purchasedCourses", userMiddleware, async (req, res) => {
   // Implement fetching purchased courses logic
-  const user = await User.findOne({
-    username: req.headers.username,
-    password: req.headers.password,
-  });
-
   try {
-    let purchasedCoursesbytheUser = [];
-    for (let index = 0; index < user.purchasedCourses.length; index++) {
-      const course = await Course.findOne({ _id: user.purchasedCourses[index] });
-      if (course) {
-        purchasedCoursesbytheUser.push(course);
-      } else {
-        console.log(
-          `Course with ID ${user.purchasedCourses[index]} not found.`
-        );
-      }
+    const user = await User.findOne({
+      username: req.headers.username,
+      password: req.headers.password,
+    });
+
+    if (!user) {
+      return res.status(404).send("User not found");
     }
-    res.send(purchasedCoursesbytheUser);
+
+    const purchasedCourses = await Course.find({
+      _id: { $in: user.purchasedCourses },
+    });
+
+    if (!purchasedCourses.length) {
+      return res.status(404).send("No purchased courses found");
+    }
+
+    res.send(purchasedCourses);
   } catch (error) {
     console.error("Error fetching purchased courses:", error);
     res.status(500).send("Error fetching purchased courses");
