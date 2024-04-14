@@ -41,7 +41,7 @@ This is a course selling application that allows admins to create courses and us
    npm start
    ```
 
-6. Run tests:
+6. Run tests: (Not implemented yet)
    ```bash
    npm test
    ```
